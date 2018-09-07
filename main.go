@@ -26,7 +26,11 @@ func main() {
 	}
 	now := time.Now()
 	state := core.GetState(now.AddDate(0, 0, -1), now)
-	dotData, err := internal.StateToGraph(state, strings.Split(*groups, ",")...)
+	gg := strings.Split(*groups, ",")
+	if gg[0] == "" {
+		gg = nil
+	}
+	dotData, err := internal.StateToGraph(state, gg...)
 	if err != nil {
 		panic(err)
 	}

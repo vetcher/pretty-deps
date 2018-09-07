@@ -71,11 +71,13 @@ func StateToGraph(s State, prefs ...string) (string, error) {
 			service := extractAndRemoveStringFromSlice(&services, index)
 			r.Wln("\t\t\"", service, "\";")
 		}
-		for index := findLinkPref(links, pref); index != -1; index = findLinkPref(links, pref) {
-			link := extractAndRemoveLinkFromSlice(&links, index)
-			link.fromToFillEmpty(DarkZone, DarkZone)
-			r.Wln("\t\t\"", link.From, "\"->\"", link.To, "\" [style=", kindToEdgeStyle(link.Kind), "];")
-		}
+		/*
+			for index := findLinkPref(links, pref); index != -1; index = findLinkPref(links, pref) {
+				link := extractAndRemoveLinkFromSlice(&links, index)
+				link.fromToFillEmpty(DarkZone, DarkZone)
+				r.Wln("\t\t\"", link.From, "\"->\"", link.To, "\" [style=", kindToEdgeStyle(link.Kind), "];")
+			}
+		*/
 		r.Wln("\t}")
 	}
 
