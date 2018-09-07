@@ -57,7 +57,7 @@ func extractAndRemoveLinkFromSlice(ss *[]Link, index int) Link {
 	return s
 }
 
-func StateToGraph(s State, prefs ...string) (string, error) {
+func StateToGraph(s State, prefs ...string) ([]byte, error) {
 	r := renderer{b: bytebuf.New()}
 	services := s.Services
 	links := s.Links
@@ -91,7 +91,7 @@ func StateToGraph(s State, prefs ...string) (string, error) {
 		r.Wln("\t\"", link.From, "\"->\"", link.To, "\" [style=", kindToEdgeStyle(link.Kind), "];")
 	}
 	r.Wln("}")
-	return r.String(), nil
+	return r.b.Bytes(), nil
 }
 
 type renderer struct {
