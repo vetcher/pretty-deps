@@ -67,6 +67,7 @@ func StateToGraph(s State, prefs ...string) ([]byte, error) {
 	r.Wln("\tedge [dirType = forward];")
 	for _, pref := range prefs {
 		r.Wln("\tsubgraph \"cluster_", pref, "\" {")
+		r.Wln("\tcolor=blue;")
 		for index := findPref(services, pref); index != -1; index = findPref(services, pref) {
 			service := extractAndRemoveStringFromSlice(&services, index)
 			r.Wln("\t\t\"", service, "\";")
