@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/intel-go/bytebuf"
@@ -57,42 +58,85 @@ func extractAndRemoveLinkFromSlice(ss *[]Link, index int) Link {
 	return s
 }
 
-func StateToGraph(s State, prefs ...string) ([]byte, error) {
+type VisualizationParams struct {
+	Prefixes     []string
+	RemovePrefix bool
+	StylingNodes map[string]StylingParams
+}
+
+func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
 	r := renderer{b: bytebuf.New()}
 	services := s.Services
 	links := s.Links
-	r.Wln("digraph {")
+	r.Wln("digraph G {")
 	r.Wln("\tnode [shape = box];")
 	r.Wln("\tgraph [rankdir = \"LR\", overlap=false];")
 	r.Wln("\tedge [dirType = forward];")
-	for _, pref := range prefs {
-		r.Wln("\tsubgraph \"cluster_", pref, "\" {")
-		r.Wln("\tcolor=blue;")
-		for index := findPref(services, pref); index != -1; index = findPref(services, pref) {
-			service := extractAndRemoveStringFromSlice(&services, index)
-			r.Wln("\t\t\"", service, "\";")
+	tree := makePrefixTree(services, params.Prefixes)
+	t := func(n int) string {
+		return strings.Repeat("\t", n)
+	}
+	walker := func(node *sTree, level int) bool {
+		if node == nil {
+			return false
 		}
-		/*
-			for index := findLinkPref(links, pref); index != -1; index = findLinkPref(links, pref) {
-				link := extractAndRemoveLinkFromSlice(&links, index)
-				link.fromToFillEmpty(DarkZone, DarkZone)
-				r.Wln("\t\t\"", link.From, "\"->\"", link.To, "\" [style=", kindToEdgeStyle(link.Kind), "];")
-			}
-		*/
-		r.Wln("\t}")
+		// root node, pass through
+		if node.Value == "" {
+			return true
+		}
+		name := node.Value
+		// cluster group
+		if node.Flag {
+			r.Wln(t(level), `subgraph "cluster_`, name, `" {`)
+			r.Wln(t(level+1), `label="`, name, `";`)
+			r.Wln(t(level+1), parens(
+				"node [",
+				strings.Join(params.StylingNodes[name].GetPairs("="), ", "),
+				"];"),
+			)
+			return true
+		}
+		r.Wln(t(level), `"`, name, `";`)
+		return true
+	}
+	walkerDef := func(node *sTree, level int) bool {
+		r.Wln(t(level), "}")
+		return false
 	}
 
-	for i := range services {
-		r.Wln("\t\"", s.Services[i], "\";")
-	}
-	r.Wln("\t\"", DarkZone, "\" [style=filled,color=black];")
-	r.Wln("\t\"", MessageBroker, "\" [style=filled,color=purple];")
+	tree.WalkLevelDefer(walker, walkerDef, 1)
+
+	r.Wln(t(1), `"`, DarkZone, "\" [style=filled,color=black];")
+	r.Wln(t(1), `"`, MessageBroker, "\" [style=filled,color=purple];")
 	for _, link := range links {
 		link.fromToFillEmpty(DarkZone, DarkZone)
-		r.Wln("\t\"", link.From, "\"->\"", link.To, "\" [style=", kindToEdgeStyle(link.Kind), "];")
+		r.Wln(t(1), `"`, link.From, `" -> "`, link.To, `" [style=`, kindToEdgeStyle(link.Kind), "];")
 	}
 	r.Wln("}")
 	return r.b.Bytes(), nil
+}
+
+func parens(left, content, right string) string {
+	if content == "" {
+		return ""
+	}
+	return left + content + right
+}
+
+type StylingParams map[string]string
+
+func (s StylingParams) Add(k, v string) {
+	s[k] = v
+}
+
+func (s StylingParams) GetPairs(sep string) []string {
+	i, x := 0, make([]string, len(s))
+	for k, v := range s {
+		x[i] = k + sep + v
+		i++
+	}
+	sort.Strings(x)
+	return x
 }
 
 type renderer struct {
