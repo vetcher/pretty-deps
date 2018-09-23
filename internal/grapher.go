@@ -59,9 +59,10 @@ func extractAndRemoveLinkFromSlice(ss *[]Link, index int) Link {
 }
 
 type VisualizationParams struct {
-	Prefixes     []string
-	RemovePrefix bool
-	StylingNodes map[string]StylingParams
+	Prefixes        []string
+	RemovePrefix    bool
+	StylingNodes    map[string]StylingParams
+	DetailThreshold int
 }
 
 func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
@@ -77,7 +78,7 @@ func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
 		return strings.Repeat("\t", n)
 	}
 	walker := func(node *sTree, level int) bool {
-		if node == nil {
+		if node == nil || level > params.DetailThreshold {
 			return false
 		}
 		// root node, pass through
@@ -86,7 +87,7 @@ func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
 		}
 		name := node.Value
 		// cluster group
-		if node.Flag {
+		if node.Flag && level < params.DetailThreshold {
 			r.Wln(t(level), `subgraph "cluster_`, name, `" {`)
 			r.Wln(t(level+1), `label="`, name, `";`)
 			r.Wln(t(level+1), parens(
