@@ -31,6 +31,34 @@ type State struct {
 	Begin, End time.Time
 }
 
+func (s *State) filterServices(allowZeroService bool) {
+	if allowZeroService {
+		return
+	}
+	set := make(stringSet)
+	for _, l := range s.Links {
+		set.Add(l.From)
+		set.Add(l.To)
+	}
+	s.Services = set.Slice()
+}
+
+type stringSet map[string]struct{}
+
+func (s stringSet) Add(key string) {
+	s[key] = struct{}{}
+}
+
+func (s stringSet) Slice() []string {
+	x := make([]string, len(s))
+	i := 0
+	for elem := range s {
+		x[i] = elem
+		i++
+	}
+	return x
+}
+
 type Link struct {
 	From   string
 	To     string
@@ -107,6 +135,7 @@ func (c Core) GetState(begin, end time.Time) State {
 		for chunk := range resDelivery {
 			result.Links = mergeLinks(result.Links, chunk.links)
 		}
+		result.filterServices(false)
 		state <- result
 	}()
 	semaphore := make(chan struct{}, parallelCount)
@@ -206,7 +235,7 @@ func (c Core) getLinks(targetUrl string) (tl tempLink, err error) {
 				from = MessageBroker
 			}
 			if from == "" || to == "" {
-				// Try to find pair if option ClientServerSameSpan is on
+				// Try to find pair if client and server have same spans
 				id := string(span.GetStringBytes("id"))
 				p := pairs[id]
 				p.fillNotEmpty(from, to)

@@ -1,5 +1,14 @@
 $mdc-theme-primary: #64b5f6;
+$mdc-icon-button-ink-color: #64b5f6;
 
 @import "@material/button/mdc-button";
 @import "@material/top-app-bar/mdc-top-app-bar";
-@import "octicons/build/build"
+@import "octicons/build/build";
+@import "@material/card/mdc-card";
+@import "@material/icon-button/mdc-icon-button";
+@import "@material/layout-grid/mdc-layout-grid";
+
+svg {
+    display: block;
+    margin: auto;
+}

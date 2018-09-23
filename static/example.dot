@@ -1,0 +1,83 @@
+digraph {
+    node [shape = box];
+    graph [rankdir = "LR", overlap=false];
+    edge [dirType = forward];
+    subgraph "cluster_backend" {
+        label="backend";
+        bff;
+        gateway;
+        "service A";
+        "service B";
+        "service C";
+        "service D";
+        "service E";
+        "service F";
+
+        bff -> "service A";
+        bff -> "service B";
+        bff -> "service C";
+        bff -> "service D";
+        gateway -> "service A";
+        gateway -> "service E";
+        gateway -> "service F";
+        "service A" -> "service C";
+        "service A" -> "service D";
+        "service A" -> "service E";
+        "service B" -> "service F";
+        subgraph "cluster_database" {
+            label="database Server";
+            "database A";
+            "database B";
+            "database C";
+            "database D";
+            "database F";
+            "database Server";
+        }
+        "service A" -> "database A";
+        "service B" -> "database B";
+        "service C" ->  "database C";
+        "service D" -> "database D";
+        "service F" -> "database F";
+        "database A" -> "database Server";
+        "database B" -> "database Server";
+        "database C" -> "database Server";
+        "database D" -> "database Server";
+        "database F" -> "database Server";
+    }
+    subgraph "cluster_frontend" {
+        label="frontend";
+        frontend;
+        static;
+        frontend -> static;
+    }
+    subgraph "cluster_external_systems" {
+        label="external_systems";
+        "client 1";
+        "client 2";
+        "client 3";
+    }
+    subgraph "cluster_clients" {
+        label="clients";
+        "browser 1";
+        "browser 2";
+        "browser 3";
+        "browser 4";
+        "browser 5";
+        "browser 6";
+        "browser 7";
+        "browser 8";
+    }
+    "database Server";
+    "browser 1" -> frontend;
+    "browser 2" -> frontend;
+    "browser 3" -> frontend;
+    "browser 4" -> frontend;
+    "browser 5" -> frontend;
+    "browser 6" -> frontend;
+    "browser 7" -> frontend;
+    "browser 8" -> frontend;
+    "client 1" -> gateway;
+    "client 2" -> gateway;
+    "client 3" -> gateway;
+    frontend -> bff;
+}

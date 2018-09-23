@@ -5,7 +5,11 @@
   "main": "index.js",
   "dependencies": {
     "@material/button": "^0.39.1",
+    "@material/card": "^0.39.3",
+    "@material/icon-button": "^0.39.3",
+    "@material/layout-grid": "^0.39.0",
     "@material/top-app-bar": "^0.39.1",
+    "material-design-icons": "^3.0.1",
     "octicons": "^8.1.0"
   },
   "devDependencies": {
