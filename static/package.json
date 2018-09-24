@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@material/button": "^0.39.1",
+    "@material/button": "^0.39.3",
     "@material/card": "^0.39.3",
+    "@material/checkbox": "^0.40.0",
+    "@material/form-field": "^0.40.0",
     "@material/icon-button": "^0.39.3",
     "@material/layout-grid": "^0.39.0",
-    "@material/top-app-bar": "^0.39.1",
+    "@material/textfield": "^0.40.0",
+    "@material/top-app-bar": "^0.39.3",
     "material-design-icons": "^3.0.1",
     "octicons": "^8.1.0"
   },
@@ -25,6 +28,7 @@
     "webpack-dev-server": "^2.4.3"
   },
   "scripts": {
+    "build": "webpack",
     "start": "webpack-dev-server"
   },
   "author": "",

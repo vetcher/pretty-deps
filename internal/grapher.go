@@ -133,7 +133,11 @@ func (s StylingParams) Add(k, v string) {
 func (s StylingParams) GetPairs(sep string) []string {
 	i, x := 0, make([]string, len(s))
 	for k, v := range s {
-		x[i] = k + sep + v
+		if v == "" {
+			x[i] = k
+		} else {
+			x[i] = k + sep + v
+		}
 		i++
 	}
 	sort.Strings(x)

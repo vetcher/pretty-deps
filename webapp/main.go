@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -37,14 +39,14 @@ func main() {
 				ctx.Writer.WriteString(err.Error())
 			}
 		}()
-		groups := ctx.QueryArray("group")
 		err = core.UpdateServicesList()
 		if err != nil {
 			return
 		}
 		now := time.Now()
 		state := core.GetState(now.AddDate(0, 0, -1), now)
-		dotData, err := internal.StateToGraph(state, groups...)
+		params := fillVisualizationParams(ctx)
+		dotData, err := internal.StateToGraph(state, params)
 		if err != nil {
 			return
 		}
@@ -61,6 +63,31 @@ func main() {
 	})
 	r.Static("/static", *staticPath)
 	r.Run(*bindAddr)
+}
+
+func fillVisualizationParams(ctx *gin.Context) internal.VisualizationParams {
+	params := internal.VisualizationParams{StylingNodes: make(map[string]internal.StylingParams)}
+	params.Prefixes = ctx.QueryArray("group")
+	params.RemovePrefix, _ = strconv.ParseBool(ctx.Query("remove-prefix"))
+	params.DetailThreshold, _ = strconv.Atoi(ctx.Query("detail-threshold"))
+	nodeStylesMap := ctx.QueryMap("node-styles")
+	for k, v := range nodeStylesMap {
+		params.StylingNodes[k] = makeMapFromString(v)
+	}
+	return params
+}
+
+func makeMapFromString(s string) map[string]string {
+	kvs := strings.Split(s, ",")
+	m := make(map[string]string, len(kvs))
+	for i := range kvs {
+		kv := strings.Split(kvs[i], "=")
+		if len(kv) == 0 {
+			continue
+		}
+		m[kv[0]] = strings.Join(kv[1:], "=")
+	}
+	return m
 }
 
 func execGraphviz(name, format string, b []byte) ([]byte, error) {

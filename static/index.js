@@ -1,8 +1,9 @@
-const root = 'http://localhost:9000/api';
+const root = 'http://localhost:9000/api?';
 
 function commonAPIRequest() {
     const r = new XMLHttpRequest();
-    r.open('GET', root, true);
+    const parameters = document.getElementById('parameters').value;
+    r.open('GET', root+parameters, true);
     r.onload = function () {
         if (this.status !== 200) {
             document.getElementById('error-text').textContent = this.responseText;
