@@ -30,7 +30,7 @@ func main() {
 	if gg[0] == "" {
 		gg = nil
 	}
-	dotData, err := internal.StateToGraph(state, gg...)
+	dotData, err := internal.StateToGraph(state, internal.VisualizationParams{})
 	if err != nil {
 		panic(err)
 	}
