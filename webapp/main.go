@@ -75,6 +75,7 @@ func fillVisualizationParams(ctx *gin.Context) internal.VisualizationParams {
 		params.DetailThreshold = math.MaxInt32
 	}
 	params.RemovePrefix, _ = strconv.ParseBool(ctx.Query("hide-names"))
+	params.Title = ctx.Query("title")
 	nodeStylesMap := ctx.QueryMap("node-styles")
 	for k, v := range nodeStylesMap {
 		params.StylingNodes[k] = makeMapFromString(v)

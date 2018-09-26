@@ -65,13 +65,15 @@ type VisualizationParams struct {
 	StylingNodes    map[string]StylingParams
 	DetailThreshold int
 	HideNames       bool
+	Title           string
 }
 
 func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
 	r := renderer{b: bytebuf.New()}
 	services := s.Services
 	links := s.Links
-	r.Wln("digraph G {")
+	r.Wln(`digraph "`, params.Title, `" {`)
+	r.Wln(`\tlabel="`, params.Title, `";`)
 	r.Wln("\tnode [shape = box];")
 	r.Wln("\tgraph [rankdir = \"LR\", overlap=false];")
 	r.Wln("\tedge [dirType = forward];")
