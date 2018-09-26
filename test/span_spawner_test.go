@@ -20,9 +20,9 @@ const (
 )
 
 const (
-	spanAmount    = 50
-	serviceAmount = 40
-	maxDeep       = 5
+	spanAmount    = 10
+	serviceAmount = 10
+	maxDeep       = 1
 	minDeep       = 1
 	nextRatio     = 0.15
 )
