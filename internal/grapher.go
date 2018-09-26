@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/intel-go/bytebuf"
@@ -63,6 +64,7 @@ type VisualizationParams struct {
 	RemovePrefix    bool
 	StylingNodes    map[string]StylingParams
 	DetailThreshold int
+	HideNames       bool
 }
 
 func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
@@ -77,6 +79,10 @@ func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
 	t := func(n int) string {
 		return strings.Repeat("\t", n)
 	}
+	norm := noopNameNormalizer
+	if params.HideNames {
+		norm = normalizeNames("s", services)
+	}
 	walker := func(node *sTree, level int) bool {
 		if node == nil || level > params.DetailThreshold {
 			return false
@@ -85,14 +91,14 @@ func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
 		if node.Value == "" {
 			return true
 		}
-		name := node.Value
+		name, origName := norm(node.Value), node.Value
 		// cluster group
 		if node.Flag && level < params.DetailThreshold {
 			r.Wln(t(level), `subgraph "cluster_`, name, `" {`)
 			r.Wln(t(level+1), `label="`, name, `";`)
 			r.Wln(t(level+1), parens(
 				"node [",
-				strings.Join(params.StylingNodes[name].GetPairs("="), ", "),
+				strings.Join(params.StylingNodes[origName].GetPairs("="), ", "),
 				"];"),
 			)
 			return true
@@ -127,11 +133,54 @@ func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
 	return r.b.Bytes(), nil
 }
 
+type nameNormalizer func(string) string
+
+func noopNameNormalizer(s string) string {
+	return s
+}
+
 func parens(left, content, right string) string {
 	if content == "" {
 		return ""
 	}
 	return left + content + right
+}
+
+func normalizeNames(prefix string, ss []string) func(string) string {
+	m := make(map[string]string, len(ss))
+	k := 0
+	f := func() string {
+		k++
+		return prefix + strconv.Itoa(k)
+	}
+	for i := range ss {
+		m[ss[i]] = f()
+	}
+	return func(s string) string {
+		if v, ok := m[s]; ok {
+			return v
+		}
+		return s
+	}
+}
+
+func sliceToStringMap(ss []string) map[string]string {
+	m := make(map[string]string, len(ss))
+	for i := range ss {
+		m[ss[i]] = ss[i]
+	}
+	return m
+}
+
+func makeSliceOfValueFromMap(m map[string]string) []string {
+	x := make([]string, len(m))
+	i := 0
+	for _, v := range m {
+		x[i] = v
+		i++
+	}
+	sort.Strings(x)
+	return x
 }
 
 type StylingParams map[string]string

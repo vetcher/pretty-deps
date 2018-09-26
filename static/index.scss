@@ -1,4 +1,4 @@
-$mdc-theme-primary: #64b5f6;
+$mdc-theme-primary: #29b6f6;
 $mdc-icon-button-ink-color: #64b5f6;
 
 @import "@material/button/mdc-button";
@@ -8,7 +8,60 @@ $mdc-icon-button-ink-color: #64b5f6;
 @import "@material/icon-button/mdc-icon-button";
 @import "@material/layout-grid/mdc-layout-grid";
 
+html {
+    font-family: Roboto;
+}
+
 svg {
     display: block;
     margin: auto;
+}
+
+svg text {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+.edge path {
+    stroke-dasharray: 10;
+    stroke-dashoffset: 20;
+    animation: dash 1s linear forwards infinite;
+}
+
+.cluster polygon {
+    fill: #ffffff;
+    fill-opacity: 0;
+    transition: all 0.5s ease;
+}
+
+.cluster polygon:hover {
+    stroke: $mdc-theme-primary;
+    fill: $mdc-theme-primary;
+    fill-opacity: 0.25;
+    stroke-width: 3.0;
+    overflow: visible;
+}
+
+.node polygon {
+    fill: #ffffff;
+    fill-opacity: 0;
+    transition: all 0.5s ease;
+}
+
+.node polygon:hover {
+    stroke: $mdc-theme-primary;
+    fill: $mdc-theme-primary;
+    fill-opacity: 0.25;
+    stroke-width: 3.0;
+    overflow: visible;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 0;
+    }
 }
