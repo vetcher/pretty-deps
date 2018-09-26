@@ -101,11 +101,21 @@ func StateToGraph(s State, params VisualizationParams) ([]byte, error) {
 		return true
 	}
 	walkerDef := func(node *sTree, level int) bool {
+		if node == nil || level > params.DetailThreshold {
+			return false
+		}
+		// root node, pass through
+		if node.Value == "" {
+			return false
+		}
+		if len(node.Children) == 0 {
+			return false
+		}
 		r.Wln(t(level), "}")
 		return false
 	}
 
-	tree.WalkLevelDefer(walker, walkerDef, 1)
+	tree.WalkLevelDefer(walker, walkerDef, 0)
 
 	r.Wln(t(1), `"`, DarkZone, "\" [style=filled,color=black];")
 	r.Wln(t(1), `"`, MessageBroker, "\" [style=filled,color=purple];")

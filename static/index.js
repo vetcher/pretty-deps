@@ -9,7 +9,7 @@ function commonAPIRequest() {
             document.getElementById('error-text').textContent = this.responseText;
             document.getElementById('error-view').style.display = 'block';
         } else {
-            document.getElementById('canvas').textContent = this.responseText;
+            document.getElementById('canvas').innerHTML = this.responseText;
             let err = document.getElementById('error-view');
             err.style.display = 'none';
         }

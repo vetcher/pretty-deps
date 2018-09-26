@@ -57,11 +57,10 @@ func (s *sTree) WalkLevelDefer(fn, def func(*sTree, int) bool, level int) {
 	if !fn(s, level) {
 		return
 	}
-	level += 1
 	for i := range s.Children {
-		s.Children[i].WalkLevel(fn, level)
+		s.Children[i].WalkLevelDefer(fn, def, level+1)
 	}
-	def(s, level)
+	def(s, level+1)
 }
 
 func (s sTree) GoString() string {

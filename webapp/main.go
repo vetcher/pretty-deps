@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -70,6 +71,9 @@ func fillVisualizationParams(ctx *gin.Context) internal.VisualizationParams {
 	params.Prefixes = ctx.QueryArray("group")
 	params.RemovePrefix, _ = strconv.ParseBool(ctx.Query("remove-prefix"))
 	params.DetailThreshold, _ = strconv.Atoi(ctx.Query("detail-threshold"))
+	if params.DetailThreshold == 0 {
+		params.DetailThreshold = math.MaxInt32
+	}
 	nodeStylesMap := ctx.QueryMap("node-styles")
 	for k, v := range nodeStylesMap {
 		params.StylingNodes[k] = makeMapFromString(v)

@@ -14,15 +14,13 @@ WORKDIR /go/src/github.com/vetcher/pretty-deps/static
 RUN npm install
 RUN npm run build
 
-FROM alpine
+FROM scratch
 
 COPY --from=frontend /go/src/github.com/vetcher/pretty-deps/static/bundle.css ./static/bundle.css
 COPY --from=frontend /go/src/github.com/vetcher/pretty-deps/static/bundle.js ./static/bundle.js
 COPY --from=backend /go/src/github.com/vetcher/pretty-deps/pretty-deps ./pretty-deps
 
-RUN pwd
-RUN ls -all
-RUN ls ./static/ -all
+RUN ./pretty-deps
 
 ENTRYPOINT ["/pretty-deps"]
 EXPOSE 9000
